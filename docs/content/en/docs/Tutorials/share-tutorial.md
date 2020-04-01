@@ -4,7 +4,6 @@ linkTitle: "OCM share functionality"
 weight: 5
 description: >
   Try the ocm (Open Cloud Mesh) share functionality in Reva locally.
-
 ---
 
 This is a guide on how to try the share functionality in Reva in your local environment.
