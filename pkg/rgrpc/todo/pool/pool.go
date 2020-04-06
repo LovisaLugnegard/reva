@@ -19,6 +19,8 @@
 package pool
 
 import (
+	"log"
+
 	appprovider "github.com/cs3org/go-cs3apis/cs3/app/provider/v1beta1"
 	appregistry "github.com/cs3org/go-cs3apis/cs3/app/registry/v1beta1"
 	authprovider "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
@@ -181,11 +183,14 @@ func GetOCMShareProviderClient(endpoint string) (ocm.OcmAPIClient, error) {
 func GetOCMInviteManagerClient(endpoint string) (invitepb.InviteAPIClient, error) {
 
 	if val, ok := ocmInviteManagers[endpoint]; ok {
+
+		log.Println("return ok when getting OCMINVITEMANAGER")
 		return val, nil
 	}
 
 	conn, err := NewConn(endpoint)
 	if err != nil {
+		log.Println("ERROR when getting OCMINVITEMANAGER")
 		return nil, err
 	}
 
