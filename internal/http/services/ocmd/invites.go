@@ -53,13 +53,10 @@ func (h *invitesHandler) Handler() http.Handler {
 		switch head {
 		case "":
 			h.generateInviteToken(w, r)
-<<<<<<< HEAD
 		case "forward":
 			h.forwardInvite(w, r)
 		case "accept":
 			h.acceptInvite(w, r)
-=======
->>>>>>> Super WIP
 		default:
 			w.WriteHeader(http.StatusNotFound)
 		}
@@ -126,8 +123,6 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Info().Msg("HOHOHOHOHO**********")
-
 	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	// response, err := gatewayClient.GetInfoByDomain(ctx, request)
 	if err != nil {
@@ -136,7 +131,6 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	expireTime := time.Now()
-
 
 	contextUser, _ := user.ContextGetUser(ctx)
 	token := &invitepb.InviteToken{

@@ -20,7 +20,6 @@ package gateway
 
 import (
 	"context"
-	"fmt"
 
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	"github.com/cs3org/reva/pkg/rgrpc/status"
@@ -47,7 +46,6 @@ func (s *svc) GenerateInviteToken(ctx context.Context, req *invitepb.GenerateInv
 func (s *svc) ForwardInvite(ctx context.Context, req *invitepb.ForwardInviteRequest) (*invitepb.ForwardInviteResponse, error) {
 	c, err := pool.GetOCMInviteManagerClient(s.c.OCMInviteManagerEndpoint)
 	if err != nil {
-		log.Debug().Str("ocminvitemanager", fmt.Sprintf("blabla")).Msg("ocminvitemanagerERROR!")
 		return &invitepb.ForwardInviteResponse{
 			Status: status.NewInternal(ctx, err, "error getting user invite provider client"),
 		}, nil
@@ -55,7 +53,6 @@ func (s *svc) ForwardInvite(ctx context.Context, req *invitepb.ForwardInviteRequ
 
 	res, err := c.ForwardInvite(ctx, req)
 	if err != nil {
-		log.Debug().Str("ocminvitemanager", fmt.Sprintf("blabla")).Msg("ocminvitemanagerERROR2222222222!")
 		return nil, errors.Wrap(err, "gateway: error calling ForwardInvite")
 	}
 
