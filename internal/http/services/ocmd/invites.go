@@ -101,24 +101,24 @@ func (h *invitesHandler) generateInviteToken(w http.ResponseWriter, r *http.Requ
 func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	type Request struct {
-		Token  string
-		Domain string
-	}
+	// type Request struct {
+	// 	Token  string
+	// 	Domain string
+	// }
 
 	if r.Body == nil {
-		http.Error(w, "Null body", 400)
+		WriteError(w, r, APIErrorInvalidParameter, "body cannot be null", nil)
 		return
 	}
-	var req Request
+	//var req Request
 
 	// Try to decode the request body into the struct. If there is an error,
 	// respond to the client with the error message and a 400 status code.
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	// err := json.NewDecoder(r.Body).Decode(&req)
+	// if err != nil {
+	// 	http.Error(w, err.Error(), http.StatusBadRequest)
+	// 	return
+	// }
 
 	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 
@@ -128,7 +128,7 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := &invitepb.InviteToken{
-		Token: req.Token,
+		Token: r.FormValue("token"),
 	}
 
 	// domainInfo, err := gatewayClient.GetInfoByDomain(ctx, ocmauthorizer.GetInfoByDomainRequest{
@@ -139,7 +139,7 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: token,
 		OriginSystemProvider: &ocmauthorizer.ProviderInfo{
-			Domain:         "domain",
+			Domain:         r.FormValue("domain"),
 			ApiVersion:     "ApiVersion",
 			ApiEndpoint:    "http://127.0.0.1:19001/ocm/invites/accept",
 			WebdavEndpoint: "WebdavEndpoint",
