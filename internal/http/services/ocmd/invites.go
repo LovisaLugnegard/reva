@@ -22,17 +22,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/pkg/appctx"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/pkg/rhttp/router"
-	"github.com/cs3org/reva/pkg/user"
 )
 
 type invitesHandler struct {
@@ -105,8 +102,8 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	type Request struct {
-		Token        string
-		ProviderInfo string
+		Token  string
+		Domain string
 	}
 
 	if r.Body == nil {
@@ -124,31 +121,27 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
-	// response, err := gatewayClient.GetInfoByDomain(ctx, request)
+
 	if err != nil {
 		WriteError(w, r, APIErrorServerError, fmt.Sprintf("error getting invite grpc client on addr: %v", h.gatewayAddr), err)
 		return
 	}
 
-	expireTime := time.Now()
-
-	contextUser, _ := user.ContextGetUser(ctx)
 	token := &invitepb.InviteToken{
-		Token:  "blbl",
-		UserId: contextUser.GetId(),
-		Expiration: &types.Timestamp{
-			Nanos:   uint32(expireTime.UnixNano()),
-			Seconds: uint64(expireTime.Unix()),
-		},
+		Token: req.Token,
 	}
+
+	// domainInfo, err := gatewayClient.GetInfoByDomain(ctx, ocmauthorizer.GetInfoByDomainRequest{
+	// 	Domain: req.Domain,
+	// })
 
 	//TODO Update these values with values from GetInfoByDomain response
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: token,
-		OriginSystemProvider: &ocmprovider.ProviderInfo{
-			Domain:         "domain",
+		OriginSystemProvider: &ocmauthorizer.ProviderInfo{
+			Domain:         "http://127.0.0.1:19001/ocm/invites/forward",
 			ApiVersion:     "ApiVersion",
-			ApiEndpoint:    "APIEndPoint",
+			ApiEndpoint:    "",
 			WebdavEndpoint: "WebdavEndpoint",
 		},
 	}
