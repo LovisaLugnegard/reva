@@ -139,9 +139,9 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: token,
 		OriginSystemProvider: &ocmauthorizer.ProviderInfo{
-			Domain:         "http://127.0.0.1:19001/ocm/invites/forward",
+			Domain:         "domain",
 			ApiVersion:     "ApiVersion",
-			ApiEndpoint:    "",
+			ApiEndpoint:    "http://127.0.0.1:19001/ocm/invites/accept",
 			WebdavEndpoint: "WebdavEndpoint",
 		},
 	}

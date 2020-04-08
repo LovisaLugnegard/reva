@@ -22,6 +22,7 @@ import (
 	"context"
 
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
+	"github.com/cs3org/reva/pkg/appctx"
 	"github.com/cs3org/reva/pkg/rgrpc/status"
 	"github.com/cs3org/reva/pkg/rgrpc/todo/pool"
 	"github.com/pkg/errors"
@@ -51,6 +52,8 @@ func (s *svc) ForwardInvite(ctx context.Context, req *invitepb.ForwardInviteRequ
 		}, nil
 	}
 
+	log := appctx.GetLogger(ctx)
+	log.Info().Msg("gateway/ocminvitemanager domain: " + req.OriginSystemProvider.Domain)
 	res, err := c.ForwardInvite(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling ForwardInvite")
