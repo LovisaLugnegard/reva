@@ -98,7 +98,7 @@ func (m *manager) ForwardInvite(ctx context.Context, invite *invitepb.InviteToke
 	log.Info().Msg("memory/memory api endpoint " + originProvider.GetApiEndpoint())
 
 	client := &http.Client{}
-	request, err := http.NewRequest("POST", originProvider.GetApiEndpoint(), strings.NewReader(requestBody.Encode()))
+	request, err := http.NewRequest("POST", originProvider.GetApiEndpoint()+"/invites/accept", strings.NewReader(requestBody.Encode()))
 	request.SetBasicAuth("einstein", "relativity")
 	resp, err := client.Do(request)
 	//resp, err := http.PostForm(originProvider.GetApiEndpoint(), requestBody)
