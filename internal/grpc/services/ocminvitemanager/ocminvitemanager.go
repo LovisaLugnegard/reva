@@ -96,7 +96,6 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		conf: c,
 		im:   im,
 	}
-
 	return service, nil
 }
 

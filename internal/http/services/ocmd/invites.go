@@ -122,6 +122,11 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		Domain: r.FormValue("domain"),
 	})
 
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error sending a grpc get invite by domain info request", err)
+		return
+	}
+
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: token,
 		OriginSystemProvider: &ocmprovider.ProviderInfo{

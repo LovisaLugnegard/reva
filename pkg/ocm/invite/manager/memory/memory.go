@@ -22,15 +22,12 @@ import (
 	"context"
 	"net/http"
 	"net/url"
-	"strings"
 	"sync"
 	"time"
 
-	"github.com/cs3org/reva/pkg/appctx"
 	"github.com/cs3org/reva/pkg/user"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-
 	invitepb "github.com/cs3org/go-cs3apis/cs3/ocm/invite/v1beta1"
 	ocmprovider "github.com/cs3org/go-cs3apis/cs3/ocm/provider/v1beta1"
 	"github.com/cs3org/reva/pkg/ocm/invite"
@@ -85,28 +82,20 @@ func (m *manager) GenerateToken(ctx context.Context) (*invitepb.InviteToken, err
 
 func (m *manager) ForwardInvite(ctx context.Context, invite *invitepb.InviteToken, originProvider *ocmprovider.ProviderInfo) error {
 	contextUser := user.ContextMustGetUser(ctx)
-	log := appctx.GetLogger(ctx)
-	log.Info().Msg("memory/memory ")
-
-	log.Info().Msg("memory/memory originProvider " + originProvider.Domain)
 	requestBody := url.Values{
 		"token":             {invite.GetToken()},
 		"userID":            {contextUser.GetId().GetOpaqueId()},
 		"recipientProvider": {contextUser.GetId().GetIdp()},
 	}
-	log.Info().Msg("memory/memory api endpoint " + originProvider.GetApiEndpoint())
 
-	client := &http.Client{}
-	request, err := http.NewRequest("POST", originProvider.GetApiEndpoint()+"/invites/accept", strings.NewReader(requestBody.Encode()))
-	request.SetBasicAuth("einstein", "relativity")
-	resp, err := client.Do(request)
-	//resp, err := http.PostForm(originProvider.GetApiEndpoint(), requestBody)
-	if err != nil {
-		err = errors.Wrap(err, "memory: error sending post request")
+	resp, err := http.PostForm(originProvider.GetApiEndpoint()+"/invites/accept", requestBody)
+
+	if resp.Status != "200" {
+		cause := errors.New(resp.Status)
+		err = errors.Wrap(cause, "memory: error sending accept post request")
 		return err
 	}
 
-	log.Info().Msg("memory/memory resp " + resp.Status)
 	resp.Body.Close()
 	return nil
 }

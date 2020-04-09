@@ -18,9 +18,9 @@
 		"webdav_endpoint": "ocm/webdav/"
 	},
 	{
-		"domain": "http://127.0.0.1:19001",
+		"domain": "test.org",
 		"api_version": "0.0.1",
-		"api_endpoint": "ocm/invites/accept",
+		"api_endpoint": "http://127.0.0.1:19001/ocm/",
 		"webdav_endpoint": "ocm/webdav/"
 	}
 ]
