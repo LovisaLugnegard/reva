@@ -88,11 +88,11 @@ func (m *manager) ForwardInvite(ctx context.Context, invite *invitepb.InviteToke
 		"recipientProvider": {contextUser.GetId().GetIdp()},
 	}
 
-	resp, err := http.PostForm(originProvider.GetApiEndpoint()+"/invites/accept", requestBody)
+	resp, _ := http.PostForm(originProvider.GetApiEndpoint()+"/invites/accept", requestBody)
 
 	if resp.Status != "200" {
 		cause := errors.New(resp.Status)
-		err = errors.Wrap(cause, "memory: error sending accept post request")
+		err := errors.Wrap(cause, "memory: error sending accept post request")
 		return err
 	}
 
