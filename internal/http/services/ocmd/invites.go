@@ -102,8 +102,8 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
 
-	if r.FormValue("token") == "" || r.FormValue("domain") == "" {
-		WriteError(w, r, APIErrorInvalidParameter, "token and domain must not be null", nil)
+	if r.FormValue("token") == "" || r.FormValue("providerDomain") == "" {
+		WriteError(w, r, APIErrorInvalidParameter, "token and providerDomain must not be null", nil)
 		return
 	}
 
@@ -118,8 +118,8 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		Token: r.FormValue("token"),
 	}
 
-	domainInfo, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
-		Domain: r.FormValue("domain"),
+	providerInfo, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+		Domain: r.FormValue("providerDomain"),
 	})
 
 	if err != nil {
@@ -128,13 +128,8 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
-		InviteToken: token,
-		OriginSystemProvider: &ocmprovider.ProviderInfo{
-			Domain:         r.FormValue("domain"),
-			ApiVersion:     domainInfo.ProviderInfo.ApiVersion,
-			ApiEndpoint:    domainInfo.ProviderInfo.ApiEndpoint,
-			WebdavEndpoint: domainInfo.ProviderInfo.WebdavEndpoint,
-		},
+		InviteToken:          token,
+		OriginSystemProvider: providerInfo.ProviderInfo,
 	}
 
 	forwardInviteResponse, err := gatewayClient.ForwardInvite(ctx, forwardInviteReq)
