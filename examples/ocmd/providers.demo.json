@@ -20,7 +20,7 @@
 	{
 		"domain": "http://127.0.0.1:19001",
 		"api_version": "0.0.1",
-		"api_endpoint": "/ocm/",
+		"api_endpoint": "ocm/invites/accept",
 		"webdav_endpoint": "ocm/webdav/"
 	}
 ]

@@ -83,18 +83,17 @@ func (m *manager) GenerateToken(ctx context.Context) (*invitepb.InviteToken, err
 	return inviteToken, nil
 }
 
-
 func (m *manager) ForwardInvite(ctx context.Context, invite *invitepb.InviteToken, originProvider *ocmprovider.ProviderInfo) error {
-	contexUser := user.ContextMustGetUser(ctx)
+	contextUser := user.ContextMustGetUser(ctx)
 	log := appctx.GetLogger(ctx)
 	log.Info().Msg("memory/memory ")
 
 	log.Info().Msg("memory/memory originProvider " + originProvider.Domain)
 	requestBody := url.Values{
 		"token":             {invite.GetToken()},
-		"userID":            {contexUser.GetId().GetOpaqueId()},
-		"recipientProvider": {contexUser.GetId().GetIdp()},
-
+		"userID":            {contextUser.GetId().GetOpaqueId()},
+		"recipientProvider": {contextUser.GetId().GetIdp()},
+	}
 	log.Info().Msg("memory/memory api endpoint " + originProvider.GetApiEndpoint())
 
 	client := &http.Client{}

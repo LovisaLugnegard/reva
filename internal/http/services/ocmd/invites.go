@@ -100,25 +100,12 @@ func (h *invitesHandler) generateInviteToken(w http.ResponseWriter, r *http.Requ
 
 func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	log := appctx.GetLogger(ctx)
 
-	// type Request struct {
-	// 	Token  string
-	// 	Domain string
-	// }
-
-	if r.Body == nil {
-		WriteError(w, r, APIErrorInvalidParameter, "body cannot be null", nil)
+	if r.FormValue("token") == "" || r.FormValue("domain") == "" {
+		WriteError(w, r, APIErrorInvalidParameter, "token and domain must not be null", nil)
 		return
 	}
-	//var req Request
-
-	// Try to decode the request body into the struct. If there is an error,
-	// respond to the client with the error message and a 400 status code.
-	// err := json.NewDecoder(r.Body).Decode(&req)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
 
 	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 
@@ -131,18 +118,17 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		Token: r.FormValue("token"),
 	}
 
-	// domainInfo, err := gatewayClient.GetInfoByDomain(ctx, ocmauthorizer.GetInfoByDomainRequest{
-	// 	Domain: req.Domain,
-	// })
+	domainInfo, err := gatewayClient.GetInfoByDomain(ctx, &ocmprovider.GetInfoByDomainRequest{
+		Domain: r.FormValue("domain"),
+	})
 
-	//TODO Update these values with values from GetInfoByDomain response
 	forwardInviteReq := &invitepb.ForwardInviteRequest{
 		InviteToken: token,
-		OriginSystemProvider: &ocmauthorizer.ProviderInfo{
+		OriginSystemProvider: &ocmprovider.ProviderInfo{
 			Domain:         r.FormValue("domain"),
-			ApiVersion:     "ApiVersion",
-			ApiEndpoint:    "http://127.0.0.1:19001/ocm/invites/accept",
-			WebdavEndpoint: "WebdavEndpoint",
+			ApiVersion:     domainInfo.ProviderInfo.ApiVersion,
+			ApiEndpoint:    domainInfo.ProviderInfo.ApiEndpoint,
+			WebdavEndpoint: domainInfo.ProviderInfo.WebdavEndpoint,
 		},
 	}
 
@@ -159,6 +145,8 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		WriteError(w, r, APIErrorServerError, "grpc forward invite request failed", err)
 		return
 	}
+
+	log.Info().Msg("Invite forwarded.")
 }
 
 func (h *invitesHandler) acceptInvite(w http.ResponseWriter, r *http.Request) {
